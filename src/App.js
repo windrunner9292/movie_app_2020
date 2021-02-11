@@ -1,5 +1,7 @@
 import React from 'react';
 import PropTypes from "prop-types";
+import axios from "axios";
+import Movie from "./Movie";
 
 // const foodILike = [
 //   {
@@ -60,27 +62,64 @@ import PropTypes from "prop-types";
 //   );
 // }
 
+// class App extends React.Component{
+//   state = {
+//     count: 0
+//   };
+
+//   add = () => {
+//     console.log("add");
+//     this.setState(current => ({count: current.count + 1 }));
+//   };
+//   minus = () => {
+//     console.log("minus");
+//     this.setState(current => ({count: current.count - 1 }));
+//   };
+
+//   render(){
+//     return (<div>
+//       <h1>The number is: {this.state.count} </h1>
+//       <button onClick={this.add}>Add</button>
+//       <button onClick={this.minus}>Minus</button>
+//     </div>
+//     );
+//   }
+// }
+
 class App extends React.Component{
   state = {
-    count: 0
+    isLoading: true,
+    movies: []
   };
 
-  add = () => {
-    console.log("add");
-    this.setState(current => ({count: current.count + 1 }));
-  };
-  minus = () => {
-    console.log("minus");
-    this.setState(current => ({count: current.count - 1 }));
-  };
+  getMovies = async () => {
+    const {
+      data: {
+        data: { movies }
+        }
+      } = await axios.get("https://yts-proxy.nomadcoders1.now.sh/list_movies.json?sort_by=rating");
+    this.setState({ movies, isLoading: false });
+  }
+
+  componentDidMount(){
+    this.getMovies();
+  }
 
   render(){
-    return (<div>
-      <h1>The number is: {this.state.count} </h1>
-      <button onClick={this.add}>Add</button>
-      <button onClick={this.minus}>Minus</button>
-    </div>
-    );
+    const { isLoading, movies } = this.state;
+    return <div>{isLoading ? "Loading" : movies.map(movie => {
+    console.log(movie);
+    return (
+        <Movie 
+        key={movie.id}
+        id={movie.id} 
+        year={movie.year} 
+        title={movie.title} 
+        summary={movie.summary} 
+        poster={movie.medium_coveR_image} 
+        />
+      );
+    })}</div>;
   }
 }
 
